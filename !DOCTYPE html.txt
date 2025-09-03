@@ -21,19 +21,30 @@
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
   }).addTo(map);
 
-  // แทนที่ URL นี้ด้วย Web App URL ที่คุณคัดลอกมา
-  const googleSheetUrl = 'https://script.google.com/macros/s/AKfycbzVdnkVL3EwVSSIRTMA2qrcoRoJlJFztFyIZo5jBHsPbs3hQXRrOQFCm2tX_1qwrIkw/exec';
+  // URL ของ Google Apps Script Web App ที่ดึงข้อมูลจาก Google Sheets
+  const googleSheetUrl = 'https://script.google.com/macros/s/AKfycbxoOtTYuTtahxsc-7YVa2zeY82SZRUu2gsWwED4OOXFDOnVZZLyUlvll0wPRRuFQiO9/exec';
 
   fetch(googleSheetUrl)
     .then(response => response.json())
     .then(data => {
       data.forEach(item => {
-        const lat = parseFloat(item.Latitude);
-        const lng = parseFloat(item.Longitude);
-        const popupContent = `<b>${item.Name}</b><br>${item.Description}`;
+        // ตรวจสอบชื่อคอลัมน์ให้ตรงกับ Google Sheets
+        const lat = parseFloat(item['ละติจูต']);
+        const lng = parseFloat(item['ลองจิจูด']);
 
-        L.marker([lat, lng]).addTo(map)
-          .bindPopup(popupContent);
+        // ตรวจสอบว่าข้อมูลพิกัดถูกต้อง
+        if (!isNaN(lat) && !isNaN(lng)) {
+          // สร้างข้อความ Pop-up โดยใช้ข้อมูลจากคอลัมน์อื่น ๆ
+          const popupContent = `
+            <b>${item['ชื่อร้านค้า']}</b><br>
+            ประเภท: ${item['ประเภทตลาด']}<br>
+            สินค้า: ${item['สินค้าที่ขาย']}<br>
+            ราคา: ${item['ราคา']} บาท
+          `;
+          
+          L.marker([lat, lng]).addTo(map)
+            .bindPopup(popupContent);
+        }
       });
     })
     .catch(error => {
